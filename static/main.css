@@ -1,0 +1,22 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+.el-dialog__header {
+    text-align: left;
+    background-color: #86DAB7;
+    padding:10px;
+}
+.el-dialog__title,.el-dialog__headerbtn .el-dialog__close {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+}
+.el-dialog__body {
+    padding: 4px 20px;
+    /* background-color: #86DAB7; */
+}
+.el-badge__content.is-dot {
+    width: 12px;
+    height: 12px;
+}

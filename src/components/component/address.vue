@@ -1,0 +1,55 @@
+<template>
+    <div class="addressShow">
+        <el-radio v-model="radioType" label="1">到医院取药</el-radio>
+        <p>
+            <span>医院地址：</span>
+            <span>陕西省西安市高新区美立方</span>
+        </p>
+        <p>
+            <el-radio v-model="radioType" label="2">配送至</el-radio>
+        </p>
+        <p v-show="selectShow">
+            <span>详细地址：</span>
+            <el-input placeholder="填写详细地址" type="textarea" :rows="2" v-model="addressInput"></el-input>
+        </p>
+        <p style="text-align:center;">
+            <el-button type="primary">确认</el-button>
+            <el-button type="danger" @click="addressCancel">取消</el-button>
+        </p>
+    </div>
+</template>
+
+
+
+<script>
+export default {
+  data() {
+    return {
+      radioType: "1",
+      addressInput: "",
+      selectShow: false
+    };
+  },
+  watch: {
+    radioType(val) {
+      console.log(val);
+      if (val == "1") {
+        this.selectShow = false;
+      } else {
+        this.selectShow = true;
+      }
+    },
+    addressCancel() {}
+  },
+  methods: {},
+  created() {}
+};
+</script>
+
+
+<style scoped>
+.addressShow {
+  text-align: left;
+}
+</style>
+
