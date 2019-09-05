@@ -5,7 +5,7 @@
         <span>祝您健康！</span>
         <div class="right">
           <span class="el-icon-user-solid"></span>
-          <span>您好，12356233</span>
+          <span>您好，{{user}}</span>
           <span class="getOut" @click="getOut">退出</span>
         </div>
       </div>
@@ -26,13 +26,14 @@
 
 <script>
 import { vm, COUNTSTR } from "./kits/vm.js";
-
+import axios from "axios";
 export default {
   name: "Home",
   data() {
     return {
       value: "0",
-      dotShow: false
+      dotShow: false,
+      user: localStorage.getItem("user")
     };
   },
   computed: {
@@ -44,8 +45,63 @@ export default {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
     },
+
+    userInit() {
+      if (localStorage.getItem("token")) {
+        axios({
+          method: "post",
+          url: axios.PARK_API + "jkda/jkda/ehrpiruser/getUser",
+          params: {
+            token: localStorage.getItem("token")
+          }
+        })
+          .then(res => {
+            if (res.data.code == 0) {
+              localStorage.setItem("personId", res.data.UserInfo.id) // 保存personId;
+							localStorage.setItem("teamCode", res.data.UserInfo.teamCode) // 签约的团队code
+            } else if (res.data.code == 501) {
+              this.$confirm(res.data.msg + "前去我的设置绑定身份信息？", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning"
+              })
+                .then(() => {
+                  this.$router.push({ path: "/setting" });
+                })
+                .catch(() => {
+                  
+                });
+            }
+          })
+          .catch(error => {
+            // this.$message.error('请检查网络');
+          });
+      } else {
+        this.$router.push({ path: "/" });
+      }
+    },
     getOut() {
-      this.$router.push({ path: "/" });
+      axios({
+        method: "post",
+        url: axios.PARK_API + "jkda/jkda/ehrpiruser/logout",
+        params: {
+          token: localStorage.getItem("token"),
+          deviceType: 1
+        } /* ,
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        } */
+      })
+        .then(res => {
+          if (res.data.code == 0) {
+            this.$router.push({ path: "/" });
+            localStorage.removeItem("token");
+          } else {
+          }
+        })
+        .catch(error => {
+          // this.$message.error('请检查网络');
+        });
     }
   },
   created() {
@@ -53,11 +109,15 @@ export default {
     var _this = this;
     vm.$on(COUNTSTR, function(count) {
       //		1.0 将count值追加到购物车中
-      // console.log(count);
+      console.log(count);
       if (count > 0) {
         _this.dotShow = true;
+      } else {
+         _this.dotShow = false;
       }
     });
+
+    this.userInit();
   }
 };
 </script>
@@ -80,6 +140,7 @@ export default {
 }
 .homeMain .getOut {
   cursor: pointer;
+  color: #00a2ff !important;
 }
 .homeMain .right {
   float: right;
@@ -103,5 +164,4 @@ export default {
   margin-top: -20px;
   margin-right: 40px;
 }
-
 </style>

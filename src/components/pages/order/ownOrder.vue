@@ -1,6 +1,6 @@
 <template>
     <div class="ownOrder">
-        <div class="orderData">
+      <!--<div class="orderData">
             <span>状态：</span>
              <el-select v-model="state" placeholder="请选择">
                 <el-option
@@ -23,7 +23,7 @@
             placeholder="选择开始日期">
             </el-date-picker>
             <el-button type="primary">确认</el-button>
-        </div>
+        </div> -->
         <el-tabs type="border-card">
             <el-tab-pane label="图文咨询">
                 <table cellspacing=0 cellpadding=10>
@@ -105,8 +105,7 @@
                         暂未开通
                     </tr>
                 </table>
-            </el-tab-pane>
-          
+            </el-tab-pane> 
         </el-tabs>
     </div>
 </template>

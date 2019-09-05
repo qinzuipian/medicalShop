@@ -3,7 +3,7 @@
         <el-radio v-model="radioType" label="1">到医院取药</el-radio>
         <p>
             <span>医院地址：</span>
-            <span>陕西省西安市高新区美立方</span>
+            <span>陕西省西安市高新区</span>
         </p>
         <p>
             <el-radio v-model="radioType" label="2">配送至</el-radio>
@@ -13,9 +13,13 @@
             <el-input placeholder="填写详细地址" type="textarea" :rows="2" v-model="addressInput"></el-input>
         </p>
         <p style="text-align:center;">
-            <el-button type="primary">确认</el-button>
+            <el-button type="primary" @click="addressSure">确认</el-button>
             <el-button type="danger" @click="addressCancel">取消</el-button>
         </p>
+
+        <div class="weixin" v-show="weixinShow">
+          <img src="./../../assets/weixin.jpg" alt="" @click="imgData">
+        </div>
     </div>
 </template>
 
@@ -27,7 +31,8 @@ export default {
     return {
       radioType: "1",
       addressInput: "",
-      selectShow: false
+      selectShow: false,
+      weixinShow: false
     };
   },
   watch: {
@@ -38,10 +43,20 @@ export default {
       } else {
         this.selectShow = true;
       }
-    },
-    addressCancel() {}
+    }
   },
-  methods: {},
+  methods: {
+    addressCancel() {
+      this.$emit("hidden");
+    },
+    addressSure() {
+      this.weixinShow = true;
+      // this.$emit("hidden");
+    },
+    imgData() {
+      console.log("ok");
+    }
+  },
   created() {}
 };
 </script>
@@ -50,6 +65,13 @@ export default {
 <style scoped>
 .addressShow {
   text-align: left;
+}
+.addressShow .weixin {
+  text-align: center;
+}
+.addressShow .weixin img {
+  width: 80px;
+  cursor: pointer;
 }
 </style>
 

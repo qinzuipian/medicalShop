@@ -32,6 +32,11 @@
         <div class="ms-login" v-show="loginShow === 2">
             <div class="ms-title">后台管理系统</div>
             <el-form :model="passwordForm" :rules="passRule" ref="passwordForm" label-width="0px" class="ms-content">
+                <el-form-item prop="phone">
+                    <el-input type="text" placeholder="请输入账号" v-model="passwordForm.phone">
+                        <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
+                    </el-input>
+                </el-form-item>
                 <el-form-item prop="oldPass">
                     <el-input type="password" placeholder="请输入原始密码" v-model="passwordForm.oldPass">
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
@@ -167,6 +172,7 @@ export default {
 
       // 修改密码data
       passwordForm: {
+        phone:"",
         oldPass: "",
         newPass: "",
         repeatpass: ""
@@ -192,20 +198,20 @@ export default {
           this.loginLoading = 2;
           axios({
             method: "post",
-            url: axios.PARK_API + "jkda/ehrpiruser/login",
-            data: {
+            url: axios.PARK_API + "jkda/jkda/ehrpiruser/login",
+            params: {
               mobile: this.ruleForm.userName,
-              password: this.ruleForm.password
-            },
+              password: this.ruleForm.password,
+              clentId: "pc"
+            } /* ,
             headers: {
               "Content-Type": "application/json;charset=UTF-8"
-            }
+            } */
           })
             .then(res => {
               if (res.data.code == 0) {
                 localStorage.setItem("token", res.data.token);
-                localStorage.setItem("navList", res.data.roleList);
-                localStorage.setItem("mainUser", this.userName);
+                localStorage.setItem("ryToken", res.data.ryToken);
                 // todo  路由有一个问题，这里跳转到app    app默认路由是住院审核   如果用户没有住院审核的页面权限   那么会产生冲突  会404页面
                 // this.$router.push("/HospitalizationExamine");
                 this.$router.push({ path: "/home" });
@@ -223,7 +229,7 @@ export default {
         }
       });
     },
-    loginBlur() {
+    /* loginBlur() {
       axios({
         method: "post",
         url: axios.PARK_API + "/sys-mgr/info",
@@ -247,7 +253,7 @@ export default {
         .catch(error => {
           // this.$message.error('请检查网络');
         });
-    },
+    }, */
     // 登录显示
     loginClick() {
       this.loginShow = 1;
@@ -266,14 +272,14 @@ export default {
         if (valid) {
           axios({
             method: "post",
-            url: axios.PARK_API + "jkda/ehrpiruser/verifyMobileCode",
+            url: axios.PARK_API + "jkda/jkda/ehrpiruser/verifyMobileCode",
             params: {
               mobile: this.registerForm.phone,
-              verifyCode: 1
-            }
-            // headers: {
-            //   "Content-Type": "application/json;charset=UTF-8"
-            // }
+              verifyCode: 1234
+            } /* ,
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            } */
           })
             .then(res => {
               if (res.data.code == 0) {
@@ -287,14 +293,15 @@ export default {
 
           axios({
             method: "post",
-            url: axios.PARK_API + "jkda/ehrpiruser/saveUser",
+            url: axios.PARK_API + "jkda/jkda/ehrpiruser/saveUser",
             params: {
               mobile: this.registerForm.phone,
-              password: this.registerForm.verifyCode
-            },
+              password: this.registerForm.verifyCode,
+              openId: "pc"
+            } /* ,
             headers: {
               "Content-Type": "application/json;charset=UTF-8"
-            }
+            } */
           })
             .then(res => {
               if (res.data.code == 0) {
@@ -315,6 +322,27 @@ export default {
     passSubmit(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
+          axios({
+            method: "post",
+            url: axios.PARK_API + "jkda/jkda/ehrpiruser/saveUser",
+            params: {
+              mobile: this.passwordForm.phone,
+              password: this.passwordForm.newPass,
+              openId: "pc"
+            } /* ,
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            } */
+          })
+            .then(res => {
+              if (res.data.code == 0) {
+                this.$message.success("修改密码成功");
+              } else {
+              }
+            })
+            .catch(error => {
+              // this.$message.error('请检查网络');
+            });
         } else {
           console.log("error submit!!");
           return false;

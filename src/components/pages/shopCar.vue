@@ -1,42 +1,30 @@
 <template>
     <div class="shopCar">
-        <div class="allOrder">
+        <div class="allOrder" v-for="(item,index) in orderListData" :key="index">
             <div class="left">
-                <span>祛痘淡化痘印修复敏感皮肤芦荟胶正品</span>
-                <p>
-                    <span>尺码</span>
-                    <span>一支装</span>
-                </p>
-            </div>
-            <div class="right">
-               <span> ￥39.00</span>
-            </div>
-            <div class="bot">
-                <el-input-number v-model="num" @change="handleChange" :min="1" :max="10" label="描述文字"></el-input-number>
-                <el-button type="danger" @click="orderDelete">删除</el-button>
-            </div>
-        </div>
-
-        <div class="allOrder">
-            <div class="left">
-                <span>培哚普利吲达帕胺片</span>
+                <span>{{item.medicalName}}</span>
                 <p>
                     <span>尺码</span>
                     <span>一瓶装</span>
                 </p>
             </div>
             <div class="right">
-               <span> ￥89.00</span>
+               <span> ￥{{item.medicalPrice}}</span>
             </div>
             <div class="bot">
-                <el-input-number v-model="num" @change="handleChange" :min="1" :max="10" label="描述文字"></el-input-number>
-                <el-button type="danger">删除</el-button>
+                <!-- <el-input-number v-model="num" @change="handleChange" :min="1" :max="10" label="描述文字"></el-input-number> -->
+                <span class="fz">x {{item.count}}</span>
+                <el-button type="danger" @click="orderDelete(item.goodsid,index)">删除</el-button>
             </div>
         </div>
+        <div v-show="this.orderListData.length==0">
+            <p>暂无订单</p>
+        </div>
 
+      
         <div class="carBot">
             <span>总金额</span>
-            <span>￥118</span>
+            <span>￥{{totalMoney}}</span>
             <span>（不含运费）</span>
             <p>
                 <el-button type="success" class="btn" @click="resultType">结算</el-button>
@@ -44,7 +32,7 @@
             
         </div>
         <el-dialog title="填写配送方式" v-if='addressVisible' :visible.sync="addressVisible" width="40%" top="10px">
-              <Address></Address>
+              <Address v-on:hidden="hidden"></Address>
         </el-dialog>
     </div>
 </template>
@@ -52,34 +40,51 @@
 
 <script>
 import Address from "./../component/address";
+import { vm, COUNTSTR } from "./../kits/vm.js";
 import { getgoodsObject, updateData, remoteItem } from "./../kits/localSg.js";
 import axios from "axios";
 export default {
   data() {
     return {
       num: 1,
-      addressVisible: false
+      addressVisible: false,
+      orderListData: [],
+      totalMoney:""
     };
   },
   methods: {
     handleChange(value) {
       console.log(value);
     },
-    orderDelete() {
+    orderDelete(goodsid, index) {
+
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
+        console.log(goodsid, index);
+        //			1.0 将this.value数组中的index这个位置的值移除(当移除了这个值的时候就会自动触发计算属性totalcount的执行)
+        // this.value.splice(index, 1);
+        //			2.0 将this.datalist中的index这个位置的值移除(当移除了这个值的时候就会自动触发计算属性totalcount的执行)
+        this.orderListData.splice(index, 1);
+        //			3.0 将localStroage中的goodsid对应的所有值移除
+        remoteItem(goodsid);
+        vm.$emit(COUNTSTR, this.orderListData.length);
         this.$message({
           type: "success",
           message: "删除成功!"
         });
+        this.getdatalist();
       });
     },
 
     resultType() {
       this.addressVisible = true;
+    },
+
+    hidden() {
+      this.addressVisible = false;
     },
 
     getdatalist() {
@@ -89,14 +94,53 @@ export default {
       //					 88:1
       //					 }
       var obj = getgoodsObject();
+      // console.log(obj);
+      // this.orderListData = obj;
+
+      var map = {},
+        dest = [];
+      for (var i = 0; i < obj.length; i++) {
+        var ai = obj[i];
+        if (!map[ai.goodsid]) {
+          dest.push({
+            goodsid: ai.goodsid,
+            medicalName: ai.medicalName,
+            medicalPrice: ai.medicalPrice,
+            count: ai.count
+          });
+          map[ai.goodsid] = ai;
+        } else {
+          for (var j = 0; j < dest.length; j++) {
+            var dj = dest[j];
+            if (dj.goodsid == ai.goodsid) {
+              console.log(
+                dj.goodsid + ":" + dj.count,
+                ai.goodsid + ":" + ai.count
+              );
+              dj.count += ai.count;
+              break;
+            }
+          }
+        }
+      }
+      // console.log(dest);
+      this.orderListData = dest;
+
+      // 总价相加
+      this.totalMoney = 0; //每次遍历商品之前对总金额进行清零
+      this.orderListData.forEach((item, index) => {
+        //遍历商品，如果选中就进行加个计算，然后累加
+          this.totalMoney += item.medicalPrice * item.count; //累加的
+      });
+
       //				2.0 将id值按照 api的参数格式提交给api
-      var idstring = "";
+      /*  var idstring = "";
       for (var key in obj) {
         idstring += key + ",";
       }
-      console.log(obj);
+      // console.log(obj);
       idstring = idstring.substring(0, idstring.length - 1);
-
+ */
       //3.0 ajax请求这个api获取到完整的商品数据信息赋值给this.datalist
       /*  var url = common.apidomain + "/api/goods/getshopcarlist/" + idstring;
       this.$http.get(url).then(function(res) {
@@ -117,18 +161,8 @@ export default {
       }); */
     },
 
-    orderDelete(goodsid, index) {
-      console.log(goodsid, index);
-      //			1.0 将this.value数组中的index这个位置的值移除(当移除了这个值的时候就会自动触发计算属性totalcount的执行)
-      this.value.splice(index, 1);
-      //			2.0 将this.datalist中的index这个位置的值移除(当移除了这个值的时候就会自动触发计算属性totalcount的执行)
-      this.datalist.splice(index, 1);
-      //			3.0 将localStroage中的goodsid对应的所有值移除
-      remoteItem(goodsid);
-    },
-
     updateData(resObj) {
-      console.log(resObj)
+      // console.log(resObj);
     }
   },
   created() {
@@ -144,6 +178,8 @@ export default {
 <style scoped>
 .shopCar {
   margin-top: 10px;
+  height: 550px;
+  overflow-y: scroll;
 }
 .shopCar .allOrder {
   width: 80%;
@@ -187,6 +223,10 @@ export default {
 .shopCar .allOrder .bot {
   text-align: center;
   padding: 10px;
+}
+.shopCar .allOrder .bot .fz {
+  font-size: 18px;
+  font-weight: 700;
 }
 .shopCar .allOrder .bot button {
   float: right;

@@ -6,79 +6,94 @@
           <div class="info">
             <h2 class="el-icon-chat-line-round">药品信息</h2>
             <p class="line"></p>
-            <div class="botinfo">
+            <div class="botinfo" v-for="(item,index) in medicalData" :key="index" @click="medicalDetail(item)">
               <div class="left">
                 <img src="./../../assets/info.jpg" alt="">
               </div>
               <div class="right">
-                <h3>培哚普利吲达帕胺片</h3>
+                <h3>{{item.drugName}}</h3>
                 <p>
-                  <span>药物分类：</span>
-                  <span>磺胺药的单方制剂/血管紧张素转化酶抑制剂的单方制剂</span>
+                  <span>药品编码：</span>
+                  <span>{{item.drugCode}}</span>
                 </p>
                 <p>
-                  <span>功能主治：</span>
-                  <span>原发性高血压。本品适用于单独服用培哚普利不能完全控制血压的患者。</span>
+                  <span>规格：</span>
+                  <span>{{item.specification}}</span>
                 </p>
                 <p>
-                  <span>用法用量：</span>
-                  <span>口服。每日一次，每次服用一片本品，最好在清晨餐前服用。在可能的情况下，建议依据个体情况对用药剂量进行逐步调整。对于适当的临床病例，可以考虑由单药治疗直接转为本品治疗。肾功能不全的患者(见【注意事项】)</span>
-                </p>
-                <p>
-                  <span>不良反应：</span>
-                  <span>与本品相关服用培哚普利可抑制肾素-血管紧张素-醛固酮轴而使吲达帕胺所致的失钾减少。服用本品的4%患者出现低钾血症(钾离子水平＜3.4mmol/L)。胃肠道常见(＞1/100，＜1/10)：便秘、口干</span>
-                </p>
-                <p>
-                  <span>批准文号：</span>
-                  <span>国药准字H20051756</span>
-                </p>
-                <p>
-                  <span>生产企业：</span>
-                  <span>施维雅（天津）制药有限公司</span>
+                  <span>价格：</span>
+                  <span>{{item.price}}</span>
                 </p>
               </div>
-            </div>
-            <div class="botinfo">
-              <div class="left">
-                <img src="./../../assets/info.jpg" alt="">
-              </div>
-              <div class="right">
-                <h3>培哚普利吲达帕胺片</h3>
-                <p>
-                  <span>药物分类：</span>
-                  <span>磺胺药的单方制剂/血管紧张素转化酶抑制剂的单方制剂</span>
-                </p>
-                <p>
-                  <span>功能主治：</span>
-                  <span>原发性高血压。本品适用于单独服用培哚普利不能完全控制血压的患者。</span>
-                </p>
-                <p>
-                  <span>用法用量：</span>
-                  <span>口服。每日一次，每次服用一片本品，最好在清晨餐前服用。在可能的情况下，建议依据个体情况对用药剂量进行逐步调整。对于适当的临床病例，可以考虑由单药治疗直接转为本品治疗。肾功能不全的患者(见【注意事项】)</span>
-                </p>
-                <p>
-                  <span>不良反应：</span>
-                  <span>与本品相关服用培哚普利可抑制肾素-血管紧张素-醛固酮轴而使吲达帕胺所致的失钾减少。服用本品的4%患者出现低钾血症(钾离子水平＜3.4mmol/L)。胃肠道常见(＞1/100，＜1/10)：便秘、口干</span>
-                </p>
-                <p>
-                  <span>批准文号：</span>
-                  <span>国药准字H20051756</span>
-                </p>
-                <p>
-                  <span>生产企业：</span>
-                  <span>施维雅（天津）制药有限公司</span>
-                </p>
-              </div>
-            </div>
+            </div>    
           </div>
         </div>
+
+         <el-dialog title="药品详情" v-if='medicalVisible' :visible.sync="medicalVisible" width="60%" top="10px">
+              <medical :medicalContent="medicalContent"></medical>
+        </el-dialog>
     </div>
 </template>
 
 <script>
+import medical from "./../component/medical";
+import axios from "axios";
 export default {
   data() {
-    return {};
+    return {
+      medicalData: [],
+      medicalVisible: false,
+      medicalContent: []
+    };
+  },
+  methods: {
+    medicalList() {
+      axios({
+        method: "post",
+        url: axios.PARK_API + "drug/basdrugbatch/queryDrugList",
+        params: {
+          token: localStorage.getItem("token")
+        }
+        /*  headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        } */
+      })
+        .then(res => {
+          if (res.data.code == 0) {
+            this.medicalData = res.data.data;
+          } else {
+          }
+        })
+        .catch(error => {
+          // this.$message.error('请检查网络');
+        });
+    },
+    medicalDetail(item) {
+      axios({
+        method: "post",
+        url: axios.PARK_API + "drug/basdrugbatch/queryMongoDrugInfo",
+        params: {
+          descId: item.descriptionCode
+        }
+        /*  headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        } */
+      })
+        .then(res => {
+          if (res.data.code == 0) {
+            this.medicalContent = res.data.data[0];
+            this.medicalVisible = true;
+          } else {
+          }
+        })
+        .catch(error => {
+          // this.$message.error('请检查网络');
+        });
+    }
+  },
+  components: { medical },
+  created() {
+    this.medicalList();
   }
 };
 </script>
@@ -108,6 +123,8 @@ export default {
 }
 .medicalMain .info .botinfo {
   /* border-bottom: 1px solid #00a2ff; */
+  height: 190px;
+  cursor: pointer;
 }
 .medicalMain .info .botinfo .left,
 .medicalMain .info .botinfo .right {

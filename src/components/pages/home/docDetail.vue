@@ -5,20 +5,25 @@
                 <img src="./../../../assets/doc.png" alt="">
             </div>
             <div class="imgfont">
-                <span>张晓云</span>
-                <span>主任医师</span>
+                <span>{{docDetilData[0].doctorName}}</span>
+                <span>医生</span>
                 <p>★★★★★
-                    <span>(1000条评价)</span>
+                    <span>({{this.commonList.length}}条评价)</span>
                 </p>
                 <p>
                     <span class="el-icon-thumb"></span>
                     <span>擅长</span>
-                    <span>高危妊娠、早产、多胎妊娠.</span>
+                    <span>{{docDetilData[0].professional}}</span>
+                </p>
+                  <p>
+                    <span class="el-icon-phone"></span>
+                    <span>电话</span>
+                    <span>{{docDetilData[0].tel}}</span>
                 </p>
                 <p>
                     <span class="el-icon-user"></span>
                     <span>简介</span>
-                    <span>主任医师、1993年毕业于上海医科大学医学系，福建省医学会妇产科分会青年委员，厦门医学会妇产科分会围产医学分会委员。多年来一直从事妇产科临床与 教学工作。2004年进修于上海国际和平妇婴保健院和江苏省人民医院生殖中心，2009年进修于新西兰惠灵顿医院产科，对妇产科常见病多发病诊治有较丰富 的临床经验，擅长高危妊娠和妊娠合并症诊治和研究。责任心强，作风严谨，为妇产科事业不懈努力。</span>
+                    <span>{{docDetilData[0].description}}</span>
                 </p>
                
             </div>
@@ -39,7 +44,7 @@
             </h2>
             <div class="content">
                 <span>科室：</span>
-                <span>产科门诊</span>
+                <span>{{docDetilData[0].professional}}</span>
                 <ul class="contentList">
                     <li>
                         <span class="el-icon-phone"></span>
@@ -64,66 +69,27 @@
                 <span class="el-icon-s-comment"></span>
                 <span>患者评价</span>
                 <ul>
-                    <li>
+                    <li v-for="(item,index) in commonList" :key="index">
                         <div class="left">
                             <img src="./../../../assets/huanzhe.png" alt="">
-                            <p>182****2369</p>
+                            <p>{{item.name}}</p>
                         </div>
                         <div class="middle">
                             <p>
                                 <span>满意度：</span>
                                 <span>★★★★★</span>
                             </p>
-                            <p>医生态度很好，很耐心，谢谢！</p>
+                            <p>{{item.scoreRemark}}</p>
                         </div>
                         <div class="right">
-                            <p>2019-12-02 12:25:36</p>
+                            <p>{{item.modifyDate}}</p>
                             <p>
                                 <span>类型：</span>
-                                <span>图文咨询</span>
+                                <span>{{item.taskName}}</span>
                             </p>
                         </div>
                     </li>
-                    <li>
-                        <div class="left">
-                            <img src="./../../../assets/huanzhe.png" alt="">
-                            <p>182****2369</p>
-                        </div>
-                        <div class="middle">
-                            <p>
-                                <span>满意度：</span>
-                                <span>★★★★★</span>
-                            </p>
-                            <p>医生态度很好，很耐心，谢谢！</p>
-                        </div>
-                        <div class="right">
-                            <p>2019-12-02 12:25:36</p>
-                            <p>
-                                <span>类型：</span>
-                                <span>图文咨询</span>
-                            </p>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="left">
-                            <img src="./../../../assets/huanzhe.png" alt="">
-                            <p>182****2369</p>
-                        </div>
-                        <div class="middle">
-                            <p>
-                                <span>满意度：</span>
-                                <span>★★★★★</span>
-                            </p>
-                            <p>医生态度很好，很耐心，谢谢！</p>
-                        </div>
-                        <div class="right">
-                            <p>2019-12-02 12:25:36</p>
-                            <p>
-                                <span>类型：</span>
-                                <span>图文咨询</span>
-                            </p>
-                        </div>
-                    </li>
+                   
                 </ul>
             </h2>
         </div>
@@ -136,7 +102,10 @@
 import axios from "axios";
 export default {
   data() {
-    return {};
+    return {
+      docDetilData:[],
+      commonList:[]
+    };
   },
   mounted() {
     console.log(this.$route.query);
@@ -146,17 +115,19 @@ export default {
     docDetil() {
       axios({
         method: "post",
-        url: axios.PARK_API + "jkda/basdoctor/list",
-        data: {
+        url: axios.PARK_API + "jkda/jkda/basdoctor/list",
+        params: {
           doctorNo: this.$route.query.docId,
-          token: "123"
-        },
+          token: localStorage.getItem("token")
+        }/* ,
         headers: {
           "Content-Type": "application/json;charset=UTF-8"
-        }
+        } */
       })
         .then(res => {
           if (res.data.code == 0) {
+            this.docDetilData = res.data.page.list;
+            // console.log(this.docDetilData)
           } else {
           }
         })
@@ -168,19 +139,21 @@ export default {
     suggestList() {
       axios({
         method: "post",
-        url: axios.PARK_API + "jkda/basservicetask/queryScoreList",
-        data: {
-          teamCode: "",
-          personId: "",
+        url: axios.PARK_API + "jkda/jkda/basservicetask/queryScoreList",
+        params: {
+          teamCode: localStorage.getItem("teamCode"),
+          personId: localStorage.getItem("personId"),
           visible: 1,
-          token: ""
-        },
+          token: localStorage.getItem("token")
+        }/* ,
         headers: {
           "Content-Type": "application/json;charset=UTF-8"
-        }
+        } */
       })
         .then(res => {
           if (res.data.code == 0) {
+            this.commonList = res.data.data;
+
           } else {
           }
         })
@@ -193,7 +166,8 @@ export default {
       this.$router.push({
         path: "/picDetail",
         query: {
-          doc:123
+          doc:this.$route.query.docId,
+          name:this.docDetilData[0].doctorName
         }
       });
     }
@@ -256,11 +230,14 @@ export default {
 .docTop .imgfont p:nth-child(4) span:nth-child(1),
 .docTop .imgfont p:nth-child(4) span:nth-child(2),
 .docTop .imgfont p:nth-child(5) span:nth-child(1),
-.docTop .imgfont p:nth-child(5) span:nth-child(2) {
+.docTop .imgfont p:nth-child(5) span:nth-child(2),
+.docTop .imgfont p:nth-child(6) span:nth-child(1),
+.docTop .imgfont p:nth-child(6) span:nth-child(2) {
   color: #00a2ff;
 }
 .docTop .imgfont p:nth-child(4) span:nth-child(3),
-.docTop .imgfont p:nth-child(5) span:nth-child(3) {
+.docTop .imgfont p:nth-child(5) span:nth-child(3),
+.docTop .imgfont p:nth-child(6) span:nth-child(3) {
   font-size: 12px;
 }
 .docTop .warning {

@@ -10,22 +10,15 @@
                     <th>操作</th>
                     <th>状态</th>
                 </tr>
-                <tr>
-                    <td>2018-12-02 12:25:30</td>
-                    <td>回到家是否还行绝对不诉讼法公司电话比较多比较好的方便</td>
+                <tr v-for="(item,index) in doctorData" :key="index">
+                    <td>{{item.hbDate}}</td>
+                    <td>{{item.taskName}}</td>
                     <td>
-                        <el-button type="danger" size="mini" @click="canceldocBtn">取消预约</el-button>
+                        <el-button type="danger" size="mini" @click="canceldocBtn(item)">取消预约</el-button>
                     </td>
-                    <td>已预约</td>
+                    <td>{{item.visitStatus==1?"已预约":"已取消"}}</td>
                 </tr>
-                <tr>
-                    <td>2018-12-02 12:25:30</td>
-                    <td>回到家是否还行绝对不诉讼法公司电话比较多比较好的方便</td>
-                    <td>
-                        <el-button type="danger" size="mini">取消预约</el-button>
-                    </td>
-                    <td>取消预约</td>
-                </tr>
+               
             </table>
         </el-tab-pane>
         <el-tab-pane label="接种预约">
@@ -36,22 +29,15 @@
                         <th>操作</th>
                         <th>状态</th>
                 </tr>
-                <tr>
-                        <td>2018-12-02 12:25:30</td>
-                        <td>回到家是否还行绝对不诉讼法公司电话比较多比较好的方便</td>
+                <tr v-for="(item,index) in recordData" :key="index">
+                        <td>{{item.hbDate}}</td>
+                        <td>{{item.vaccineName}}</td>
                         <td>
-                            <el-button type="danger" size="mini" @click="cancelApp">取消预约</el-button>
+                            <el-button type="danger" size="mini" @click="cancelApp(item)">取消预约</el-button>
                         </td>
-                        <td>已预约</td>
+                        <td>{{item.visitStatus == 0?"已预约":"已取消"}}</td>
                 </tr>
-                <tr>
-                        <td>2018-12-02 12:25:30</td>
-                        <td>回到家是否还行绝对不诉讼法公司电话比较多比较好的方便</td>
-                        <td>
-                            <el-button type="danger" size="mini">取消预约</el-button>
-                        </td>
-                        <td>取消预约</td>
-                </tr>
+               
             </table>
         </el-tab-pane>
       
@@ -65,25 +51,29 @@
 import axios from "axios";
 export default {
   data() {
-    return {};
+    return {
+      doctorData: [],
+      recordData: []
+    };
   },
   methods: {
-    //   医生预约记录
+    //医生预约记录
     doctorlist() {
       axios({
         method: "post",
-        url: axios.PARK_API + "jkda/basappointreg/list",
-        data: {
-          token: "",
-          personId: "",
+        url: axios.PARK_API + "jkda/jkda/basappointreg/list",
+        params: {
+          token: localStorage.getItem("token"),
+          personId: localStorage.getItem("personId"),
           limit: 1000
-        },
+        } /* ,
         headers: {
           "Content-Type": "application/json;charset=UTF-8"
-        }
+        } */
       })
         .then(res => {
           if (res.data.code == 0) {
+            this.doctorData = res.data.page.list;
           } else {
           }
         })
@@ -92,47 +82,56 @@ export default {
         });
     },
     //医生预约取消
-    canceldocBtn() {
-      axios({
-        method: "post",
-        url: axios.PARK_API + "jkda/basappointreg/updateVisitStatus",
-        data: {
-          token: "",
-          personId: "",
-          packId: "",
-          itemId: "",
-          visitStatus: 3,
-          doctorNo: ""
-        },
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8"
-        }
+    canceldocBtn(item) {
+      this.$confirm("取消订单, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       })
-        .then(res => {
-          if (res.data.code == 0) {
-          } else {
-          }
+        .then(() => {
+          axios({
+            method: "post",
+            url: axios.PARK_API + "jkda/jkda/basappointreg/updateVisitStatus",
+            data: {
+              token: localStorage.getItem("token"),
+              personId: localStorage.getItem("personId"),
+              packId: item.packId,
+              itemId: item.itemId,
+              visitStatus: 3,
+              doctorNo: item.doctorNo
+            },
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            }
+          })
+            .then(res => {
+              if (res.data.code == 0) {
+              } else {
+              }
+            })
+            .catch(error => {
+              // this.$message.error('请检查网络');
+            });
         })
-        .catch(error => {
-          // this.$message.error('请检查网络');
-        });
+        .catch(() => {});
     },
     // 接种预约记录
     recordlist() {
       axios({
         method: "post",
-        url: axios.PARK_API + "jkda/basvaccinationreg/list",
-        data: {
-          token: "",
-          personId: "",
+        url: axios.PARK_API + "jkda/jkda/basvaccinationreg/list",
+        params: {
+          token: localStorage.getItem("token"),
+          personId: localStorage.getItem("personId"),
           limit: 1000
-        },
+        } /* ,
         headers: {
           "Content-Type": "application/json;charset=UTF-8"
-        }
+        } */
       })
         .then(res => {
           if (res.data.code == 0) {
+            this.recordData = res.data.page.list;
           } else {
           }
         })
@@ -141,28 +140,38 @@ export default {
         });
     },
     //接种取消预约
-    cancelApp() {
-      axios({
-        method: "post",
-        url: axios.PARK_API + "jkda/basvaccinationreg/updateVisitStatus",
-        data: {
-          token: "",
-          personId: "",
-          visitStatus: 3,
-          vaccineId: ""
-        },
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8"
-        }
+    cancelApp(item) {
+      this.$confirm("取消订单, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       })
-        .then(res => {
-          if (res.data.code == 0) {
-          } else {
-          }
+        .then(() => {
+          axios({
+            method: "post",
+            url: axios.PARK_API + "jkda/jkda/basvaccinationreg/updateVisitStatus",
+            data: {
+              token: localStorage.getItem("token"),
+              personId: localStorage.getItem("personId"),
+              visitStatus: 3,
+              vaccineId: item.vaccineId
+            },
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            }
+          })
+            .then(res => {
+              if (res.data.code == 0) {
+                this.$message.success("预约取消成功");
+                this.recordlist();
+              } else {
+              }
+            })
+            .catch(error => {
+              // this.$message.error('请检查网络');
+            });
         })
-        .catch(error => {
-          // this.$message.error('请检查网络');
-        });
+        .catch(() => {});
     }
   },
   created() {

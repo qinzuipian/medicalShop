@@ -28,10 +28,10 @@
                     <i class="el-icon-setting"></i>
                     <span slot="title">我的设置</span>
                 </el-menu-item>
-                <el-menu-item index="evaluate">
+                <!-- <el-menu-item index="evaluate">
                     <i class="el-icon-s-comment"></i>
                     <span slot="title">就医评价</span>
-                </el-menu-item>
+                </el-menu-item> -->
               </el-menu>
            </div>
           <router-view class="rightContent"></router-view>

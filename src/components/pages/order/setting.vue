@@ -7,18 +7,35 @@
                     <img src="./../../../assets/pic.png" alt="">
                     <p>
                         <span>登录名：</span>
-                        <span>1523662233</span>
+                        <span>{{user}}</span>
                     </p>
-                    <p>
+                   <!--  <p>
                         <span>姓名：</span>
                         <el-input v-model="name" style="width:260px" placeholder="请输入内容"></el-input>
+                    </p> -->
+                     <p>
+                       <span class="txt">上传身份证照片：</span>
+                        <el-upload
+                          action=""
+                          list-type="picture-card"
+                          :on-preview="handlePictureCardPreview"
+                          :on-remove="handleRemove"
+                          :on-change="Filechange"
+                          :on-progress="Fileprogress"
+                          :auto-upload=false>
+                          <i class="el-icon-plus"></i>
+                          </el-upload>
+                          <el-dialog :visible.sync="dialogVisible">
+                          <img width="100%" :src="dialogImageUrl" alt="">
+                          </el-dialog>
                     </p>
                     <p>
                         <span>身份证号：</span>
                         <el-input v-model="idcard" style="width:260px" placeholder="请输入内容"></el-input>
                     </p>
+                   
                     <p>
-                        <el-button type="primary">保存</el-button>
+                        <el-button type="primary" @click="idCardSave">保存</el-button>
                     </p>
                 </div>
             </el-tab-pane>
@@ -46,11 +63,17 @@
                 </div> 
             </el-tab-pane>
         </el-tabs>
+
+         <el-dialog title="确认信息" v-if='idcardVisible' :visible.sync="idcardVisible" width="36%" top="10px">
+              <idcard :idcardData="idcardData" v-on:hidden="hidden"></idcard>
+        </el-dialog>
     </div>
 </template>
 
 
 <script>
+import idcard from "./../../component/idcard";
+import axios from "axios";
 export default {
   data() {
     var checkAge = (rule, value, callback) => {
@@ -84,7 +107,7 @@ export default {
     return {
       name: "",
       idcard: "",
-
+      user: localStorage.getItem("user"),
       ruleForm2: {
         pass: "",
         checkPass: "",
@@ -94,7 +117,12 @@ export default {
         pass: [{ validator: validatePass, trigger: "blur" }],
         checkPass: [{ validator: validatePass2, trigger: "blur" }],
         age: [{ validator: checkAge, trigger: "blur" }]
-      }
+      },
+      idcardVisible: false,
+      idcardData: [],
+      dialogImageUrl: "",
+      dialogVisible: false,
+      imglistUrl: ""
     };
   },
   methods: {
@@ -103,20 +131,20 @@ export default {
         if (valid) {
           axios({
             method: "post",
-            url: axios.PARK_API + "/sys-mgr/sys/user/password",
+            url: axios.PARK_API + "jkda/sys/user/password",
             data: {
               password: this.ruleForm2.pass,
-              newPassword: this.ruleForm2.age
+              newPassword: this.ruleForm2.age,
+              token: localStorage.getItem("token")
             },
             headers: {
               "Content-Type": "application/json;charset=UTF-8",
-              token: localStorage.getItem("token")
             }
           })
             .then(res => {
               if (res.data.code == 0) {
-                this.$message("密码修改成功");
-                this.$router.push({ path: "/app" });
+                this.$message.success("密码修改成功");
+                this.$router.push({ path: "/home" });
               } else {
                 this.$message.error(res.data.msg);
               }
@@ -132,7 +160,89 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
+    },
+
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      console.log(file);
+      this.dialogVisible = true;
+    },
+    Filechange(file, fileList) {
+      console.log(file, fileList);
+      this.getBase64(file.url);
+    },
+
+    getBase64(fileSrc) {
+      console.log(fileSrc);
+      //转成base64
+      var Img = new Image();
+      Img.src = fileSrc; // 传过来的图片路径在这里用。
+      //				/* console.log(Img.src)*/
+      /* Img.width = "280";
+      Img.height = "240"; */
+      var _this = this;
+      Img.onload = function() {
+        var canvas = document.createElement("canvas");
+        canvas.width = Img.width;
+        canvas.height = Img.height;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(Img, 0, 0, Img.width, Img.height);
+        var ext = Img.src.substring(Img.src.lastIndexOf(".") + 1).toLowerCase();
+        var dataURL = canvas.toDataURL("image/" + ext);
+        //截掉前缀
+        // var database64 = dataURL.substring(dataURL.indexOf(',') + 1);
+        // console.log(database64)
+        // _this.imglistUrl = dataURL;
+        _this.idCardSure(dataURL);
+        // console.log(_this.imglistUrl)
+      };
+    },
+    Fileprogress(event, file, fileList) {
+      console.log(event, file, fileList);
+    },
+
+    // 身份证信息确认
+    idCardSure(dataURL) {
+      axios({
+        method: "post",
+        url: axios.PARK_API + "jkda/jkda/baiduFace/identificationIdCard",
+        data: {
+          image: dataURL
+        },
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      })
+        .then(res => {
+          console.log(res);
+          if (res.data.code == 0) {
+            this.idcardData = res.data.data.words_result;
+            this.idcard = res.data.data.words_result.公民身份号码.words;
+            localStorage.setItem("idCardpath", res.data.data.filePath);
+            localStorage.setItem("personId", res.data.data.personId);
+            /*   this.idcardVisible = true;
+            this.idcardData = res.data.page.list[0]; */
+          } else {
+          }
+        })
+        .catch(error => {
+          // this.$message.error('请检查网络');
+        });
+    },
+
+    idCardSave() {
+      this.idcardVisible = true;
+    },
+    hidden() {
+      this.idcardVisible = false;
     }
+  },
+  components: {
+    idcard
   }
 };
 </script>

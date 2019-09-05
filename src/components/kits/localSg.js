@@ -7,11 +7,12 @@
 
 // 1.0 定义常量key,将来操作的localStorage中的数据都以这个key来作为标识
 export const KEY = 'goodsdata';
-export var valueObj = {goodsid:0,count:0};
+export var valueObj = {goodsid:0,count:0,medicalName:"",medicalPrice:0};
 
 // 2.0 实现数据的增加
 // value;格式： {goodsid:87,count:10}
 export function setItem(value){
+    console.log(value);
     //1.0 获取json格式
     var jsonString =  localStorage.getItem(KEY);
     jsonString = jsonString || '[]';
@@ -41,6 +42,7 @@ export function remoteItem(goodsid){
             arr.splice(i,1);
         }
     }
+    // console.log(arr)
 
 //    将最新的arr保存回localStorage中
     localStorage.setItem(KEY,JSON.stringify(arr));
@@ -67,6 +69,7 @@ export function getgoodsObject(){
 * [{goodsid:87,count:1},{goodsid:87,count:3},{goodsid:88,count:1}]
 * */
     var arr  = getItem();
+    // console.log(arr)
 // 将arr数组中的goodid相同的多个对象合并成同一个对象
     var resObj ={};
     for(var i = 0 ; i<arr.length; i++){
@@ -81,7 +84,8 @@ export function getgoodsObject(){
         }
     }
 
-    return resObj;
+    // return resObj;
+    return arr;
 }
 
 //obj的格式：{goodsid:87,type:'add'}

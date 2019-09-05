@@ -36,21 +36,26 @@
                     </h2>
 
                     <el-row>
-                      <el-col :span="8">
+                      <el-col :span="8" v-for="(item,index) in this.doctorlistData" :key="index">
                         <div class="grid-content">
                           <div class="doc">
                             <img src="./../../../assets/doc.png" alt="">
                             <p>
-                              <span>张晓云</span>
-                              <span>主任医师</span>
+                              <span>{{item.doctorName}}</span>
+                              <span>{{item.teamName}}</span>
                             </p>
                              <p>
-                              <span>产科门诊</span>
+                              <span>{{item.professional}}</span>
                               <span>★★★★★</span>
                             </p>
                             <p>
-                              擅长：早产，内科
+                              擅长：{{item.description}}
                             </p>
+                             <p>
+                              <span>所属医院：</span>
+                              <span>{{item.hospitalName}}</span>
+                            </p>
+                           
                            <ul>
                              <li>
                                <span class="el-icon-phone">电话咨询</span>
@@ -59,7 +64,7 @@
                                <span class="el-icon-s-comment">即时问诊</span>
                              </li>
                              <li>
-                               <router-link :to="{path:'/docDetail',query: {docId: id}}">
+                               <router-link :to="{path:'/docDetail',query: {docId: item.doctorNo}}">
                                   <span class="el-icon-picture">图文咨询</span>
                                </router-link>                              
                              </li>
@@ -67,64 +72,7 @@
                           </div>
                         </div>
                       </el-col>
-                      <el-col :span="8">
-                        <div class="grid-content">
-                          <div class="doc">
-                              <img src="./../../../assets/doc.png" alt="">
-                              <p>
-                                <span>张晓云</span>
-                                <span>主任医师</span>
-                              </p>
-                              <p>
-                                <span>产科门诊</span>
-                                <span>★★★★★</span>
-                              </p>
-                              <p>
-                                擅长：早产，内科
-                              </p>
-                              <ul>
-                              <li>
-                                <span class="el-icon-phone">电话咨询</span>
-                              </li>
-                              <li>
-                                <span class="el-icon-s-comment">即时问诊</span>
-                              </li>
-                              <li>
-                                <span class="el-icon-picture">图文咨询</span>
-                              </li>
-                              </ul>
-                          </div>
-                        </div>
-                      </el-col>
-                      <el-col :span="8">
-                        <div class="grid-content">
-                          <div class="doc">
-                                <img src="./../../../assets/doc.png" alt="">
-                                <p>
-                                  <span>张晓云</span>
-                                  <span>主任医师</span>
-                                </p>
-                                <p>
-                                  <span>产科门诊</span>
-                                  <span>★★★★★</span>
-                                </p>
-                                <p>
-                                  擅长：早产，内科
-                                </p>
-                              <ul>
-                                <li>
-                                  <span class="el-icon-phone">电话咨询</span>
-                                </li>
-                                <li>
-                                  <span class="el-icon-s-comment">即时问诊</span>
-                                </li>
-                                <li>
-                                  <span class="el-icon-picture">图文咨询</span>
-                                </li>
-                              </ul>
-                          </div>
-                        </div>
-                      </el-col>
+                     
                     </el-row>
                   </div>
               </div>
@@ -161,6 +109,7 @@
                               <el-date-picker
                                 v-model="docDate"
                                 type="date"
+                                value-format="yyyy-MM-dd"
                                 placeholder="选择日期">
                               </el-date-picker>
                               <!-- <el-button type="primary">确认</el-button> -->
@@ -168,78 +117,37 @@
                             </p>
                             <p>
                               <span class="demonstration">选择就诊人</span>
-                              <el-input type="text" style="width:220px"></el-input>
-                              <el-button type="primary" size="medium" @click="selectPeople">选择</el-button>
+                              <el-input type="text" style="width:220px" v-model="peopleName"></el-input>
+                              <!-- <el-button type="primary" size="medium" @click="selectPeople">选择</el-button> -->
                             </p>
                             <p>
                               <span class="demonstration">选择服务项目</span>
-                              <el-input type="text" style="width:220px"></el-input>
+                              <el-input type="text" style="width:220px" v-model="projectselect"></el-input>
                               <el-button type="primary" size="medium" @click="selectProject">选择</el-button>
                             </p>
                             <el-row>
-                                <el-col :span="8">
+                                <el-col :span="8" v-for="(item,index) in this.doctorlistData" :key="index">
                                   <div class="grid-content">
                                     <div class="doc">
                                       <img src="./../../../assets/doc.png" alt="">
                                       <p>
-                                        <span>张晓云</span>
-                                        <span>主任医师</span>
+                                        <span>{{item.doctorName}}</span>
+                                        <span>{{item.teamName}}</span>
                                       </p>
                                       <p>
-                                        <span>产科门诊</span>
+                                        <span>{{item.professional}}</span>
                                         <span>★★★★★</span>
                                       </p>
                                       <p>
-                                        擅长：早产，内科
+                                        擅长：{{item.description}}
                                       </p>
-                                      <P class="docApp" @click="docProject">
+                                      <P class="docApp" @click="docProject(item)">
                                          <span class="el-icon-edit-outline">预约项目</span>
                                       </P>
                                     </div>
                                   </div>
                                 </el-col>
-                                <el-col :span="8">
-                                    <div class="grid-content">
-                                        <div class="doc">
-                                            <img src="./../../../assets/doc.png" alt="">
-                                            <p>
-                                              <span>张晓云</span>
-                                              <span>主任医师</span>
-                                            </p>
-                                            <p>
-                                              <span>产科门诊</span>
-                                              <span>★★★★★</span>
-                                            </p>
-                                            <p>
-                                              擅长：早产，内科
-                                            </p>
-                                            <P class="docApp">
-                                              <span class="el-icon-edit-outline">预约项目</span>
-                                            </P>
-                                        </div>
-                                    </div>
-                                </el-col>
-                                <el-col :span="8">
-                                      <div class="grid-content">
-                                            <div class="doc">
-                                                  <img src="./../../../assets/doc.png" alt="">
-                                                  <p>
-                                                    <span>张晓云</span>
-                                                    <span>主任医师</span>
-                                                  </p>
-                                                  <p>
-                                                    <span>产科门诊</span>
-                                                    <span>★★★★★</span>
-                                                  </p>
-                                                  <p>
-                                                    擅长：早产，内科
-                                                  </p>
-                                                  <P class="docApp">
-                                                    <span class="el-icon-edit-outline">预约项目</span>
-                                                  </P>
-                                            </div>
-                                      </div>
-                                </el-col>
+                                
                             </el-row>
                       </div>
 
@@ -250,74 +158,41 @@
                             <p>
                               <span class="demonstration">选择接种时间</span>
                               <el-date-picker
-                                v-model="docDate"
+                                v-model="vacDate"
+                                 value-format="yyyy-MM-dd"
                                 type="date"
                                 placeholder="选择日期">
                               </el-date-picker>
-                              <el-button type="primary">确认</el-button>
+                              <!-- <el-button type="primary">确认</el-button> -->
 
                             </p>
                             <p>
-                              <span class="demonstration">选择接种人</span>
-                              <el-input type="text" style="width:220px"></el-input>
-                              <el-button type="primary" @click="vacPeople">选择</el-button>
+                              <span class="demonstration">接种人</span>
+                              <el-input type="text" style="width:220px" v-model="vaccinePeople"></el-input>
+                              <!-- <el-button type="primary" @click="vacPeople">选择</el-button> -->
 
                             </p>
                             <el-row>
-                                <el-col :span="8">
+                                <el-col :span="8" v-for="(item,index) in vaccineList" :key="index">
                                   <div class="grid-content">
                                     <div class="doc">
                                       <img src="./../../../assets/vaccine.png" alt="">
                                       <p>
                                         <span>疫苗名称：</span>
-                                        <span>百白破疫苗</span>
+                                        <span>{{item.vaccineName}}</span>
+                                        (<span>{{item.shortName}}</span>)
                                       </p>
                                       <p class="vacline"></p>                                    
                                       <p style="margin-top:10px;">
                                         注意事项：局部反应可表现为红肿、疼痛和硬结，一般不需特殊处理，大多数儿童经适当休息即可恢复正常。较重的局部反应可用干净的毛巾热敷。
                                       </p>
-                                      <P class="vacApp"  @click="vaccineApp">
+                                      <P class="vacApp"  @click="vaccineApp(item)">
                                          <span class="el-icon-edit-outline">预约接种</span>
                                       </P>
                                     </div>
                                   </div>
                                 </el-col>
-                                <el-col :span="8">
-                                    <div class="grid-content">
-                                      <div class="doc">
-                                        <img src="./../../../assets/vaccine.png" alt="">
-                                        <p>
-                                          <span>疫苗名称：</span>
-                                          <span>百白破疫苗</span>
-                                        </p>
-                                        <p class="vacline"></p>                                    
-                                        <p style="margin-top:10px;">
-                                          注意事项：局部反应可表现为红肿、疼痛和硬结，一般不需特殊处理，大多数儿童经适当休息即可恢复正常。较重的局部反应可用干净的毛巾热敷。
-                                        </p>
-                                        <P class="vacApp">
-                                          <span class="el-icon-edit-outline">预约接种</span>
-                                        </P>
-                                      </div>
-                                    </div>
-                                </el-col>
-                                <el-col :span="8">
-                                  <div class="grid-content">
-                                    <div class="doc">
-                                      <img src="./../../../assets/vaccine.png" alt="">
-                                      <p>
-                                        <span>疫苗名称：</span>
-                                        <span>百白破疫苗</span>
-                                      </p>
-                                      <p class="vacline"></p>                                    
-                                      <p style="margin-top:10px;">
-                                        注意事项：局部反应可表现为红肿、疼痛和硬结，一般不需特殊处理，大多数儿童经适当休息即可恢复正常。较重的局部反应可用干净的毛巾热敷。
-                                      </p>
-                                      <P class="vacApp">
-                                         <span class="el-icon-edit-outline">预约接种</span>
-                                      </P>
-                                    </div>
-                                  </div>
-                                </el-col>
+                              
                             </el-row>
                       </div>
                   </div>
@@ -331,7 +206,7 @@
         </el-dialog>
 
         <el-dialog title="选择服务项目" v-if='projectVisible' :visible.sync="projectVisible" width="60%" top="10px">
-              <project></project>
+              <project :projectData="projectData" v-on:serchList="serchList" v-on:projectCancel="projectCancel"></project>
         </el-dialog>
 
 
@@ -348,11 +223,18 @@ export default {
   data() {
     return {
       docDate: "",
-      id: "123",
+      vacDate: "",
       selectText: "医生预约",
       docShow: 1,
       peopleVisible: false,
-      projectVisible: false
+      projectVisible: false,
+      doctorlistData: [],
+      projectData: [],
+      projectselect: "",
+      packId: "",
+      itemId: "",
+      peopleName: "",
+      vaccinePeople:""
     };
   },
   methods: {
@@ -361,19 +243,16 @@ export default {
       //从后台获取到对象数组
       axios({
         method: "post",
-        url: axios.PARK_API + "jkda/basteam/list",
-        data: {
-          teamCode: "",
-          personId: "",
-          token: ""
-        },
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8"
+        url: axios.PARK_API + "jkda/jkda/basteam/list",
+        params: {
+          teamCode: localStorage.getItem("teamCode"),
+          personId: localStorage.getItem("personId"),
+          token: localStorage.getItem("token")
         }
       })
         .then(res => {
           if (res.data.code == 0) {
-            this.id = "123";
+            this.doctorlistData = res.data.page.list;
           } else {
           }
         })
@@ -395,23 +274,123 @@ export default {
     selectPeople() {
       this.peopleVisible = true;
     },
+    serchList(val) {
+      this.projectselect = val.taskName;
+      this.packId = val.packId;
+      this.itemId = val.itemId;
+    },
     selectProject() {
-      this.projectVisible = true;
+      axios({
+        method: "post",
+        url: axios.PARK_API + "jkda/jkda/basservicetask/queryTaskList",
+        params: {
+          personId: localStorage.getItem("personId"),
+          token: localStorage.getItem("token"),
+          type: 2
+        }
+      })
+        .then(res => {
+          if (res.data.code == 0) {
+            this.projectVisible = true;
+            this.projectData = res.data.data;
+          } else {
+          }
+        })
+        .catch(error => {
+          // this.$message.error('请检查网络');
+        });
+    },
+    projectCancel() {
+      this.projectVisible = false;
     },
     vacPeople() {
       this.peopleVisible = true;
     },
     // 医生预约的预约项目
-    docProject() {
-      // this.$message.success('预约成功');
+    docProject(item) {
+      console.log(item);
+
+      axios({
+        method: "post",
+        url: axios.PARK_API + "jkda/jkda/basappointreg/save",
+        data: {
+          token: localStorage.getItem("token"),
+          personId: localStorage.getItem("personId"),
+          doctorNo: item.doctorNo,
+          personName: this.peopleName,
+          doctorName: item.doctorName,
+          hospitalCode: item.hospitalCode,
+          packId: this.packId,
+          itemId: this.itemId,
+          hbDate: this.docDate
+        },
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      })
+        .then(res => {
+          if (res.data.code == 0) {
+            this.$message.success("预约成功");
+          } else {
+          }
+        })
+        .catch(error => {
+          // this.$message.error('请检查网络');
+        });
     },
     // 病种预约项目
-    vaccineApp() {
+    vaccineApp(item) {
       // this.$message.success("预约成功");
+      axios({
+        method: "post",
+        url: axios.PARK_API + "jkda/jkda/basvaccinationreg/save",
+        data: {
+          token: localStorage.getItem("token"),
+          vaccineName: item.vaccineName,
+          vaccineId: item.vaccineId,
+          personId: localStorage.getItem("personId"),
+          hbDate: this.vacDate
+        },
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      })
+        .then(res => {
+          if (res.data.code == 0) {
+            this.$message.success("预约成功");
+          } else {
+          }
+        })
+        .catch(error => {
+          // this.$message.error('请检查网络');
+        });
+    },
+    vaccineList() {
+      axios({
+        method: "post",
+        url: axios.PARK_API + "jkda/jkda/vaccinationitem/list",
+        params: {
+          token: localStorage.getItem("token"),
+          limit: 1000
+        } /* ,
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        } */
+      })
+        .then(res => {
+          if (res.data.code == 0) {
+            this.vaccineList = res.data.page.list;
+          } else {
+          }
+        })
+        .catch(error => {
+          // this.$message.error('请检查网络');
+        });
     }
   },
   created() {
     this.doctorList();
+    this.vaccineList();
   },
   components: {
     patient,
@@ -484,12 +463,13 @@ export default {
 }
 .doctor .doc {
   width: 76%;
-  height: 240px;
+  height: 280px;
   /* background: #000; */
   border-radius: 4px;
   border: 1px solid #e1e1e1;
   padding: 10px;
   position: relative;
+  margin-top: 10px;
 }
 .doctor .demonstration {
   font-size: 14px;
@@ -530,7 +510,8 @@ export default {
   cursor: pointer;
 }
 
-.doctor .doc p:nth-child(4) {
+.doctor .doc p:nth-child(4),
+.doctor .doc p:nth-child(5) {
   margin-top: 20px;
   color: gray;
 }

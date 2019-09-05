@@ -1,34 +1,34 @@
 <template>
     <div class="medicalShop">
         <div class="medLeft">
-            <img src="./../../../assets/shop1.jpg" alt="">
+            <img :src=medical.commodityPicture alt="">
             <p>
-              <span> 温馨提示：</span>
+              <span>温馨提示：</span>
               <span>图片均为亮健网对原品的真实拍摄，仅供参考；如遇新包装上市可能存在上新滞后，请以实物为准。</span>            
             </p>
         </div>
         <div class="medRight">
-          <h2>嘉应重感灵片 48片</h2>
-          <p>解表清热，疏风止痛。用于表邪未解、郁里化热引起的重症感冒，症见恶寒、高热、头痛、四肢酸痛、咽痛、鼻塞、咳嗽等。</p>
+          <h2>{{medical.name}}</h2>
+          <!-- <p>解表清热，疏风止痛。用于表邪未解、郁里化热引起的重症感冒，症见恶寒、高热、头痛、四肢酸痛、咽痛、鼻塞、咳嗽等。</p> -->
           <p class="red">
             <span>￥</span>
-            <span>6.00</span>
+            <span>{{medical.commodityPrice}}</span>
           </p>
-          <p>
+         <!--  <p>
             <span>通用名：</span>
-            <span>重感灵片</span>
+            <span>{{medical.name}}</span>
           </p>
           <p>
             <span>批准文号：</span>
             <span>国药准字Z44022468 （国家食药总局查询）</span>
+          </p> -->
+          <p>
+            <span>所属医院：</span>
+            <span>{{medical.hospitalName}}</span>
           </p>
           <p>
-            <span>生产厂家：</span>
-            <span> 广东嘉应制药股份有限公司</span>
-          </p>
-          <p>
-            <span>规格：</span>
-            <span>48片</span>
+            <span>类型：</span>
+            <span>{{medical.commodityInfo}}</span>
           </p>
           <p class="ballshow">
             <span>数量：</span>
@@ -51,27 +51,11 @@
           </p>
           <div class="explain">
               <p>药品说明书</p>
-              <div class="medicontent">
+              <div class="medicontent" v-for="(it,index) in medicalContent" :key="index">
                   <p>
-                    <span>【药品名称】</span>
-                    <span>通用名称：重感灵片</span>
+                    {{index}}:{{it}}
                   </p>
-                  <p>
-                    <span>【主要成分】</span>
-                    <span>毛冬青、羌活、葛根、石膏、马鞭草、板蓝根、青蒿、马来酸氯苯那敏、安乃近。</span>
-                  </p>
-                  <p>
-                    <span>【性 状】</span>
-                    <span>本品为糖衣片，除去糖衣后显棕褐色；味苦。</span>
-                  </p>
-                  <p>
-                    <span>【适应症/主治功能】</span>
-                    <span>解表清热，疏风止痛。用于表邪未解、郁里化热引起的重症感冒，症见恶寒、高热、头痛、四肢酸痛、咽痛、鼻塞、咳嗽等。</span>
-                  </p>
-                  <p>
-                    <span>【规格型号】</span>
-                    <span>48片</span>
-                  </p>
+    
               </div>
           </div>
         </div>
@@ -84,12 +68,21 @@
 //使用vm对象
 import { vm, COUNTSTR } from "./../../kits/vm.js";
 import { setItem, valueObj } from "./../../kits/localSg.js";
+import axios from "axios";
+import { setTimeout } from "timers";
 export default {
   data() {
     return {
       Addnum: "",
-      isshow: false //控制小球的显示状态
+      isshow: false, //控制小球的显示状态
+      medical: "",
+      medicalContent:[]
     };
+  },
+  mounted() {
+    //  console.log(this.$route.query);
+    this.medical = this.$route.query;
+    console.log(this.medical);
   },
   methods: {
     handleChange() {},
@@ -114,12 +107,44 @@ export default {
       // 1.0 触发事件
       vm.$emit(COUNTSTR, this.Addnum);
       // 2.0 将数据保存到localStroage中
-      valueObj.goodsid = this.id;
+      valueObj.goodsid = this.medical.drugId;
       valueObj.count = this.Addnum;
+      valueObj.medicalName = this.medical.name;
+      valueObj.medicalPrice = this.medical.commodityPrice;
       setItem(valueObj);
       //3.0实现小球动画
       this.isshow = !this.isshow;
+    },
+
+    // 药品说明书
+    medicalDetail() {
+      console.log(this.medical.drugId);
+      axios({
+        method: "post",
+        url: axios.PARK_API + "drug/basdrugbatch/queryMongoDrugInfo",
+        params: {
+          descId: this.medical.descId
+        }
+        /*  headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        } */
+      })
+        .then(res => {
+          if (res.data.code == 0) {
+            this.medicalContent = res.data.data[0];
+          } else {
+          }
+        })
+        .catch(error => {
+          // this.$message.error('请检查网络');
+        });
     }
+  },
+  created() {
+    var _this = this;
+    setTimeout(function() {
+      _this.medicalDetail();
+    }, 300);
   }
 };
 </script>
@@ -179,12 +204,13 @@ export default {
   font-size: 28px;
 }
 .medicalShop .medRight .explain p:nth-child(1) {
-  height: 20px;
-  line-height: 20px;
+ /*  height: 20px;
+  line-height: 20px; */
   padding: 10px;
   background-color: #d9f1ff;
   border-top: 1px solid #00a2ff;
 }
+
 .medicalShop .medRight .explain .medicontent p:nth-child(1) {
   background-color: transparent;
   border-top: 0;

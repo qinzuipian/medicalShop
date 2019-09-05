@@ -1,58 +1,17 @@
 <template>
     <div class="shopMain">
         <ul>
-          <router-link to="/medicalShop">
-              <li>
-                <img src="./../../../assets/shop1.jpg" alt="">
-                <p>￥56</p>
-                <p>【尼群地平片|本品主要成份及其化学名称为：2,6-二甲基-4-(3-硝基苯基)-1，4-二氢-3，5-吡啶二甲酸甲乙酯。】</p>
+          
+              <li v-for="(item,index) in shoplistData" :key="index" @click="Limedical(item)">
+                <!-- <router-link :to="{path:'/medicalShop',query: item}"> -->
+                  <div>
+                      <img :src="item.commodityPicture" alt="">
+                      <p>￥{{item.commodityPrice}}</p>
+                      <p>【{{item.name}} | {{item.hospitalName}}】</p>
+                  </div>
+                 <!-- </router-link>  -->
               </li>
-          </router-link> 
-          <li>
-            <img src="./../../../assets/shop1.jpg" alt="">
-            <p>￥56</p>
-            <p>【尼群地平片|本品主要成份及其化学名称为：2,6-二甲基-4-(3-硝基苯基)-1，4-二氢-3，5-吡啶二甲酸甲乙酯。】</p>
-          </li>
-          <li>
-            <img src="./../../../assets/shop1.jpg" alt="">
-            <p>￥56</p>
-            <p>【尼群地平片|本品主要成份及其化学名称为：2,6-二甲基-4-(3-硝基苯基)-1，4-二氢-3，5-吡啶二甲酸甲乙酯。】</p>
-          </li>
-          <li>
-            <img src="./../../../assets/shop1.jpg" alt="">
-            <p>￥56</p>
-            <p>【尼群地平片|本品主要成份及其化学名称为：2,6-二甲基-4-(3-硝基苯基)-1，4-二氢-3，5-吡啶二甲酸甲乙酯。】</p>
-          </li>
-          <li>
-            <img src="./../../../assets/shop1.jpg" alt="">
-            <p>￥56</p>
-            <p>【尼群地平片|本品主要成份及其化学名称为：2,6-二甲基-4-(3-硝基苯基)-1，4-二氢-3，5-吡啶二甲酸甲乙酯。】</p>
-          </li>
-          <li>
-            <img src="./../../../assets/shop1.jpg" alt="">
-            <p>￥56</p>
-            <p>【尼群地平片|本品主要成份及其化学名称为：2,6-二甲基-4-(3-硝基苯基)-1，4-二氢-3，5-吡啶二甲酸甲乙酯。】</p>
-          </li>
-          <li>
-            <img src="./../../../assets/shop1.jpg" alt="">
-            <p>￥56</p>
-            <p>【尼群地平片|本品主要成份及其化学名称为：2,6-二甲基-4-(3-硝基苯基)-1，4-二氢-3，5-吡啶二甲酸甲乙酯。】</p>
-          </li>
-          <li>
-            <img src="./../../../assets/shop1.jpg" alt="">
-            <p>￥56</p>
-            <p>【尼群地平片|本品主要成份及其化学名称为：2,6-二甲基-4-(3-硝基苯基)-1，4-二氢-3，5-吡啶二甲酸甲乙酯。】</p>
-          </li>
-          <li>
-            <img src="./../../../assets/shop1.jpg" alt="">
-            <p>￥56</p>
-            <p>【尼群地平片|本品主要成份及其化学名称为：2,6-二甲基-4-(3-硝基苯基)-1，4-二氢-3，5-吡啶二甲酸甲乙酯。】</p>
-          </li>
-          <li>
-            <img src="./../../../assets/shop1.jpg" alt="">
-            <p>￥56</p>
-            <p>【尼群地平片|本品主要成份及其化学名称为：2,6-二甲基-4-(3-硝基苯基)-1，4-二氢-3，5-吡啶二甲酸甲乙酯。】</p>
-          </li>
+         
         </ul>
     </div>
 </template>
@@ -60,14 +19,48 @@
 
 
 <script>
+import axios from "axios";
 export default {
   data() {
-    return {};
+    return {
+      shoplistData: []
+    };
   },
   methods: {
-    liClick() {
-      this.$router.push({ path: "/shop/medicalShop" });
+    shopList() {
+      axios({
+        method: "post",
+        url: axios.PARK_API + "drug/drug/commoditylist/queryDrugList",
+        data: {},
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      })
+        .then(res => {
+          if (res.data.code == 0) {
+            this.shoplistData = res.data.data;
+            console.log(this.shoplistData);
+            for (var i = 0; i < this.shoplistData.length; i++) {
+              this.shoplistData[i].commodityPicture = this.shoplistData[
+                i
+              ].commodityPicture.split(";")[0];
+            }
+          } else {
+          }
+        })
+        .catch(error => {
+          // this.$message.error('请检查网络');
+        });
+    },
+    Limedical(item) {
+      this.$router.push({
+        path: "/medicalShop",
+        query: item
+      });
     }
+  },
+  created() {
+    this.shopList();
   }
 };
 </script>
@@ -85,6 +78,7 @@ export default {
 }
 .shopMain ul li img {
   width: 80%;
+  height: 220px;
   /* width: 200px; */
 }
 .shopMain ul li p {

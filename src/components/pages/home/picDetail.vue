@@ -8,7 +8,7 @@
             </ul>
             <ul>
                 <li>坐诊医生：</li>
-                <li>吴芹</li>
+                <li>{{this.$route.query.name}}</li>
             </ul>
             <ul>
                 <li>问诊费：</li>
@@ -136,16 +136,16 @@ export default {
       console.log(event, file, fileList);
     },
     picSubmit() {
-      console.log(JSON.stringify(this.imglistUrl));
+      // console.log(JSON.stringify(this.imglistUrl));
       axios({
         method: "post",
-        url: axios.PARK_API + "jkda/medicalupload/upload",
+        url: axios.PARK_API + "jkda/jkda/medicalupload/upload",
         data: {
-          personId: "",
-          token: "",
-          doctorCode: "",
+          personId: localStorage.getItem("personId"),
+          token: localStorage.getItem("token"),
+          doctorCode: this.$route.query.doc,
           messageInfo: this.disease,
-          file: "",
+          file: this.imglistUrl,
           type: 2
         },
         headers: {
@@ -154,6 +154,7 @@ export default {
       })
         .then(res => {
           if (res.data.code == 0) {
+            this.$message.success("提交成功");
           } else {
           }
         })
