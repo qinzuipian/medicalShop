@@ -15,6 +15,7 @@ import evaluate from '@/components/pages/order/evaluate'
 import medical from '@/components/pages/medical'
 import shop from '@/components/pages/shop/shop'
 import medicalShop from '@/components/pages/shop/medicalShop'
+import payment from '@/components/pages/shop/payment'
 
 import shopCar from '@/components/pages/shopCar'
 
@@ -100,7 +101,12 @@ export default new Router({
         path: '/shopCar',
         name: 'shopCar',
         component: shopCar
-      }
+      },
+      {
+        path: '/payment',
+        name: 'payment',
+        component: payment
+      },
       ]
     }
   ]

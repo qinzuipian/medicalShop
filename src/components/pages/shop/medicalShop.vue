@@ -43,7 +43,7 @@
             <span>确保正品</span>
             <span>专</span>
             <span>专业药师</span>
-            <span>付货到付款退</span>
+            <span>货到付款</span>
             <span>七天无理由退换</span>
           </p>
           <p>
@@ -59,7 +59,6 @@
               </div>
           </div>
         </div>
-
     </div>
 </template>
 
@@ -76,27 +75,27 @@ export default {
       Addnum: "",
       isshow: false, //控制小球的显示状态
       medical: "",
-      medicalContent:[]
+      medicalContent: []
     };
   },
   mounted() {
-    //  console.log(this.$route.query);
+    //console.log(this.$route.query);
     this.medical = this.$route.query;
-    console.log(this.medical);
+    //console.log(this.medical);
   },
   methods: {
     handleChange() {},
     //动画3个方法
     beforeEnter(el) {
-      //				设定小球的初始位置
+      //设定小球的初始位置
       el.style.transform = "translate(0px,0px)";
     },
     enter(el, done) {
-      //				保证小球出现动画
+      //保证小球出现动画
       el.offsetWidth;
-      //				设置小球的结束位置
+      //设置小球的结束位置
       el.style.transform = "translate(578px,-258px)";
-      //				结束动画
+      //结束动画
       done();
     },
     afterEnter(el) {
@@ -115,7 +114,6 @@ export default {
       //3.0实现小球动画
       this.isshow = !this.isshow;
     },
-
     // 药品说明书
     medicalDetail() {
       console.log(this.medical.drugId);
@@ -204,7 +202,7 @@ export default {
   font-size: 28px;
 }
 .medicalShop .medRight .explain p:nth-child(1) {
- /*  height: 20px;
+  /*  height: 20px;
   line-height: 20px; */
   padding: 10px;
   background-color: #d9f1ff;

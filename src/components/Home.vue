@@ -57,20 +57,22 @@ export default {
         })
           .then(res => {
             if (res.data.code == 0) {
-              localStorage.setItem("personId", res.data.UserInfo.id) // 保存personId;
-							localStorage.setItem("teamCode", res.data.UserInfo.teamCode) // 签约的团队code
+              localStorage.setItem("personId", res.data.UserInfo.id); // 保存personId;
+              localStorage.setItem("teamCode", res.data.UserInfo.teamCode); // 签约的团队code
             } else if (res.data.code == 501) {
-              this.$confirm(res.data.msg + "前去我的设置绑定身份信息？", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning"
-              })
+              this.$confirm(
+                res.data.msg + "前去我的设置绑定身份信息？",
+                "提示",
+                {
+                  confirmButtonText: "确定",
+                  cancelButtonText: "取消",
+                  type: "warning"
+                }
+              )
                 .then(() => {
                   this.$router.push({ path: "/setting" });
                 })
-                .catch(() => {
-                  
-                });
+                .catch(() => {});
             }
           })
           .catch(error => {
@@ -113,9 +115,18 @@ export default {
       if (count > 0) {
         _this.dotShow = true;
       } else {
-         _this.dotShow = false;
+        _this.dotShow = false;
       }
     });
+
+    if (
+      localStorage.getItem("goodsdata") &&
+      localStorage.getItem("goodsdata") != "[]"
+    ) {
+      this.dotShow = true;
+    } else {
+      this.dotShow = false;
+    }
 
     this.userInit();
   }

@@ -9,7 +9,7 @@
                 </p>
             </div>
             <div class="right">
-               <span> ￥{{item.medicalPrice}}</span>
+               <span>￥{{item.medicalPrice}}</span>
             </div>
             <div class="bot">
                 <!-- <el-input-number v-model="num" @change="handleChange" :min="1" :max="10" label="描述文字"></el-input-number> -->
@@ -19,9 +19,7 @@
         </div>
         <div v-show="this.orderListData.length==0">
             <p>暂无订单</p>
-        </div>
-
-      
+        </div>   
         <div class="carBot">
             <span>总金额</span>
             <span>￥{{totalMoney}}</span>
@@ -31,8 +29,8 @@
             </p>
             
         </div>
-        <el-dialog title="填写配送方式" v-if='addressVisible' :visible.sync="addressVisible" width="40%" top="10px">
-              <Address v-on:hidden="hidden"></Address>
+        <el-dialog title="填写配送方式" v-if='addressVisible' :visible.sync="addressVisible"  width="40%" top="10px">
+              <Address v-on:hidden="hidden" :totalMoney="totalMoney" :orderListData="orderListData"></Address>
         </el-dialog>
     </div>
 </template>
@@ -49,7 +47,7 @@ export default {
       num: 1,
       addressVisible: false,
       orderListData: [],
-      totalMoney:""
+      totalMoney: ""
     };
   },
   methods: {
@@ -57,26 +55,29 @@ export default {
       console.log(value);
     },
     orderDelete(goodsid, index) {
-
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(() => {
-        console.log(goodsid, index);
-        //			1.0 将this.value数组中的index这个位置的值移除(当移除了这个值的时候就会自动触发计算属性totalcount的执行)
-        // this.value.splice(index, 1);
-        //			2.0 将this.datalist中的index这个位置的值移除(当移除了这个值的时候就会自动触发计算属性totalcount的执行)
-        this.orderListData.splice(index, 1);
-        //			3.0 将localStroage中的goodsid对应的所有值移除
-        remoteItem(goodsid);
-        vm.$emit(COUNTSTR, this.orderListData.length);
-        this.$message({
-          type: "success",
-          message: "删除成功!"
+      })
+        .then(() => {
+          console.log(goodsid, index);
+          //			1.0 将this.value数组中的index这个位置的值移除(当移除了这个值的时候就会自动触发计算属性totalcount的执行)
+          // this.value.splice(index, 1);
+          //			2.0 将this.datalist中的index这个位置的值移除(当移除了这个值的时候就会自动触发计算属性totalcount的执行)
+          this.orderListData.splice(index, 1);
+          //			3.0 将localStroage中的goodsid对应的所有值移除
+          remoteItem(goodsid);
+          vm.$emit(COUNTSTR, this.orderListData.length);
+          this.$message({
+            type: "success",
+            message: "删除成功!"
+          });
+          this.getdatalist();
+        })
+        .catch(() => {
+          // console.log('取消删除');
         });
-        this.getdatalist();
-      });
     },
 
     resultType() {
@@ -113,10 +114,10 @@ export default {
           for (var j = 0; j < dest.length; j++) {
             var dj = dest[j];
             if (dj.goodsid == ai.goodsid) {
-              console.log(
+              /*  console.log(
                 dj.goodsid + ":" + dj.count,
                 ai.goodsid + ":" + ai.count
-              );
+              ); */
               dj.count += ai.count;
               break;
             }
@@ -130,10 +131,10 @@ export default {
       this.totalMoney = 0; //每次遍历商品之前对总金额进行清零
       this.orderListData.forEach((item, index) => {
         //遍历商品，如果选中就进行加个计算，然后累加
-          this.totalMoney += item.medicalPrice * item.count; //累加的
+        this.totalMoney += item.medicalPrice * item.count; //累加的
       });
 
-      //				2.0 将id值按照 api的参数格式提交给api
+      //2.0 将id值按照 api的参数格式提交给api
       /*  var idstring = "";
       for (var key in obj) {
         idstring += key + ",";
@@ -160,7 +161,6 @@ export default {
         this.datalist = res.body.message;
       }); */
     },
-
     updateData(resObj) {
       // console.log(resObj);
     }
